@@ -225,10 +225,13 @@ export default function App() {
         setPage("home");
       } catch (err) {
         if (cancelled) return;
-        const unauthorized = err?.status === 401 || err?.status === 403;
-        if (storedUser && !unauthorized) {
+        if (storedUser) {
           setPage("home");
-          console.warn("Using cached session due to temporary network/auth check failure.");
+          setToken(storedToken || "cookie");
+          setUser(storedUser);
+          userRef.current = storedUser;
+          setSettings(storedUser.settings || { hideDropButtons: false });
+          console.warn("Using cached local session. Server auth check failed.");
         } else {
           setToken(null);
           setUser(null);
