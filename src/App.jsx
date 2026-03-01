@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { api } from "./api";
 import { socket, connectSocket, disconnectSocket } from "./socket";
 import { ToastContainer } from "./components/Toast";
-import { useToast } from "./hooks/useToast";
+import { useToast } from "./hooks/useToast.js";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
