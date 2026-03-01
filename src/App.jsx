@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage";
 import TournamentsPage from "./pages/TournamentsPage";
 import SettingsPage from "./pages/SettingsPage";
 import FriendsPage from "./pages/FriendsPage";
+import RanksPage from "./pages/RanksPage";
 import { getRatingTier } from "./utils/ratingTier";
 import Icon from "./components/Icon";
 import "./styles.css";
@@ -21,12 +22,14 @@ const NAV = [
   { key: "friends", icon: "friends", label: "Friends" },
   { key: "game", icon: "game", label: "Game Room" },
   { key: "leaderboard", icon: "trophy", label: "Leaderboard" },
+  { key: "ranks", icon: "rank", label: "Ranks" },
   { key: "tournaments", icon: "target", label: "Tournaments" },
   { key: "profile", icon: "user", label: "Profile" },
   { key: "settings", icon: "settings", label: "Settings" },
 ];
 const SESSION_TOKEN_KEY = "quadx_token";
 const SESSION_USER_KEY = "quadx_user";
+const FRIEND_MATCH_TIME_CONTROL_SEC = 120;
 
 export default function App() {
   // Auth
@@ -421,6 +424,7 @@ export default function App() {
     if (!user || !token) return;
     if (page === "home") { loadRecentMatches(); loadFriends(); }
     if (page === "friends") { loadFriends(); loadLiveRooms(); }
+    if (page === "ranks") loadFriends();
     if (page === "leaderboard") loadLeaderboard(leaderboardPeriod);
     if (page === "tournaments") loadTournaments();
   }, [page, user, token, leaderboardPeriod, loadFriends, loadLeaderboard, loadLiveRooms, loadRecentMatches, loadTournaments]);
@@ -497,15 +501,22 @@ export default function App() {
 
     const inviteRoomId = pendingFriendInvites[targetKey];
     if (inviteRoomId) {
-      joinRoom(inviteRoomId);
-      return;
+      const invitedRoom = (liveRooms || []).find((r) => r.roomId === inviteRoomId);
+      const inviteIsTwoMinuteWaitingRoom = invitedRoom
+        && invitedRoom.status === "waiting"
+        && Number(invitedRoom.timeControlSec) === FRIEND_MATCH_TIME_CONTROL_SEC;
+      if (inviteIsTwoMinuteWaitingRoom) {
+        joinRoom(inviteRoomId);
+        return;
+      }
     }
 
     const existingFriendRoom = (liveRooms || []).find((r) => {
       const players = Array.isArray(r.players) ? r.players : [];
       const hasTarget = players.some((p) => String(p.username || "").toLowerCase() === targetKey);
       const canJoin = r.status === "waiting" && players.length < Number(r.maxPlayers || 0);
-      return hasTarget && canJoin;
+      const isTwoMinuteRoom = Number(r.timeControlSec) === FRIEND_MATCH_TIME_CONTROL_SEC;
+      return hasTarget && canJoin && isTwoMinuteRoom;
     });
     if (existingFriendRoom?.roomId) {
       joinRoom(existingFriendRoom.roomId);
@@ -519,7 +530,7 @@ export default function App() {
     }
 
     setPendingChallengeTarget(target);
-    createRoom(2, 120);
+    createRoom(2, FRIEND_MATCH_TIME_CONTROL_SEC);
   }
 
   function startRoom() {
@@ -858,6 +869,13 @@ export default function App() {
               period={leaderboardPeriod}
               onChangePeriod={changeLeaderboardPeriod}
               onOpenProfile={openProfile}
+            />
+          )}
+
+          {page === "ranks" && (
+            <RanksPage
+              user={user}
+              friends={friends}
             />
           )}
 

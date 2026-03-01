@@ -47,6 +47,15 @@ function Icon({ name, size = 16, strokeWidth = 1.9, className = "" }) {
           <path d="M8 6H5a3 3 0 0 0 3 3M16 6h3a3 3 0 0 1-3 3" />
         </svg>
       );
+    case "rank":
+      return (
+        <svg {...common}>
+          <path d="M4 20h16" />
+          <path d="M6 20v-5h3v5" />
+          <path d="M11 20v-9h3v9" />
+          <path d="M16 20v-13h3v13" />
+        </svg>
+      );
     case "target":
       return (
         <svg {...common}>
