@@ -475,7 +475,7 @@ select option { background: var(--bg2); }
 }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.google-wrap { display: flex; justify-content: center; width: 100%; min-width: 0; overflow: hidden; }
+.google-wrap { display: flex;flex-direction: column; justify-content: center; width: 80%; min-width: 0; overflow: hidden; }
 .google-wrap > div { width: 100%; min-width: 0; display: flex; justify-content: center; }
 
 /* ─── HOME ─────────────────────────────────────── */
