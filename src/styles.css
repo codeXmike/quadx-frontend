@@ -46,6 +46,17 @@ body {
   overflow-x: hidden;
 }
 
+#root, .app, .content {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ─── LAYOUT ─────────────────────────────────────── */
 .app { display: flex; min-height: 100vh; }
 
@@ -212,7 +223,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  white-space: nowrap;
+  white-space: normal;
   text-decoration: none;
   position: relative;
   overflow: hidden;
@@ -278,7 +289,16 @@ input:focus, select:focus, textarea:focus {
 select option { background: var(--bg2); }
 
 /* ─── TABS ─────────────────────────────────────── */
-.tabs { display: flex; gap: 0.25rem; background: rgba(0,0,0,0.3); padding: 0.25rem; border-radius: 10px; border: 1px solid var(--border); }
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(0,0,0,0.3);
+  padding: 0.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  min-width: 0;
+  overflow-x: auto;
+}
 .tab {
   flex: 1; padding: 0.45rem 0.75rem; border-radius: 7px;
   font-size: 0.82rem; font-weight: 600; cursor: pointer;
@@ -475,7 +495,14 @@ select option { background: var(--bg2); }
 }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.google-wrap { display: flex;flex-direction: column; justify-content: center; width: 80%; min-width: 0; overflow: hidden; }
+.google-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
 .google-wrap > div { width: 100%; min-width: 0; display: flex; justify-content: center; }
 
 /* ─── HOME ─────────────────────────────────────── */
@@ -483,6 +510,7 @@ select option { background: var(--bg2); }
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 1.25rem;
+  min-width: 0;
 }
 
 .welcome-banner {
@@ -599,6 +627,9 @@ select option { background: var(--bg2); }
 
 .match-info { min-width: 0; }
 .match-desc { font-size: 0.8rem; color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.text-muted, .text-dim, .match-desc, .friend-name, .panel-title {
+  overflow-wrap: anywhere;
+}
 .match-date { font-size: 0.7rem; color: var(--text3); }
 .rating-delta {
   margin-left: 0.45rem;
@@ -638,6 +669,7 @@ select option { background: var(--bg2); }
   grid-template-columns: 1fr 320px;
   gap: 1.25rem;
   align-items: start;
+  min-width: 0;
 }
 
 .board-container { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
@@ -655,6 +687,8 @@ select option { background: var(--bg2); }
   font-size: 0.82rem;
   transition: all 0.2s;
   position: relative;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .player-chip.active-turn {
@@ -670,7 +704,15 @@ select option { background: var(--bg2); }
   box-shadow: 0 0 6px var(--player-color);
 }
 
-.chip-name { font-weight: 600; color: var(--text); }
+.chip-name {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .chip-mark { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--text2); }
 .chip-you { font-size: 0.65rem; background: var(--amber-glow); color: var(--amber); padding: 0.1rem 0.35rem; border-radius: 4px; font-weight: 700; }
 
@@ -863,7 +905,12 @@ select option { background: var(--bg2); }
 .chat-input-row input { font-size: 0.82rem; }
 
 /* ─── LEADERBOARD ─────────────────────────────── */
-.lb-table { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.lb-table {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
 
 .lb-head, .lb-row {
   display: grid;
@@ -871,6 +918,7 @@ select option { background: var(--bg2); }
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
+  min-width: 520px;
 }
 
 .lb-head {
@@ -1028,6 +1076,7 @@ select option { background: var(--bg2); }
   .clock-time { font-size: 1.15rem; }
   .board-outer { --cell-size: clamp(24px, 7.6vw, 42px); padding: 0.6rem; }
   .drop-cols, .board-grid { gap: 0.28rem; }
+  .chip-name { max-width: 96px; }
 }
 
 @media (max-width: 420px) {
@@ -1088,3 +1137,17 @@ select option { background: var(--bg2); }
   font-size: 0.72rem; font-weight: 600; color: var(--green);
 }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1s ease infinite; }
+
+/* Performance: disable costly animations globally */
+.toast,
+.hero-eyebrow,
+.hero-title,
+.hero-sub,
+.hero-cta,
+.live-dot,
+.queue-dot,
+.chess-clock.low-time,
+.cell.winning,
+.cell.drop-anim::after {
+  animation: none !important;
+}
