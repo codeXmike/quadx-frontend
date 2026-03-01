@@ -181,12 +181,18 @@ function RoomView({
               <div className="text-xs text-dim" style={{ textAlign: "center", padding: "1rem 0" }}>No messages yet</div>
             )}
             {(chatMessages || []).map((msg) => (
-              <div key={msg.id} className="chat-msg">
-                <span className="chat-user" style={{ color: playersByMark[msg.mark]?.color || "var(--amber)" }}>
-                  {msg.username}
-                </span>
-                <span className="chat-text">{msg.message}</span>
-              </div>
+              msg.type === "divider" ? (
+                <div key={msg.id} className="chat-divider">
+                  <span>{msg.message || "New match"}</span>
+                </div>
+              ) : (
+                <div key={msg.id} className="chat-msg">
+                  <span className="chat-user" style={{ color: playersByMark[msg.mark]?.color || "var(--amber)" }}>
+                    {msg.username}
+                  </span>
+                  <span className="chat-text">{msg.message}</span>
+                </div>
+              )
             ))}
             <div ref={chatEndRef} />
           </div>

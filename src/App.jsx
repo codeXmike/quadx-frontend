@@ -71,6 +71,20 @@ export default function App() {
   const [settings, setSettings] = useState({ hideDropButtons: false });
   const [settingsLoading, setSettingsLoading] = useState(false);
 
+  function insertChatDivider(label = "New match started") {
+    setChatMessages((prev) => {
+      if (!prev.length) return prev;
+      return [
+        ...prev,
+        {
+          id: `divider_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+          type: "divider",
+          message: label
+        }
+      ];
+    });
+  }
+
   useEffect(() => {
     userRef.current = user;
   }, [user]);
@@ -314,7 +328,7 @@ export default function App() {
     socket.on("error:event", ({ message }) => toast.error(message));
     socket.on("move:rejected", ({ message }) => toast.error(message));
     socket.on("room:rematch", () => {
-      setChatMessages([]);
+      insertChatDivider("New match");
       toast.info("Rematch started!");
     });
 
@@ -359,6 +373,7 @@ export default function App() {
   }, [token]);
 
   const loadFriends = useCallback(async () => {
+    console.log("Loading friends and requests...", token);
     if (!token) return;
     try {
       const [fr, rq] = await Promise.all([api.getFriends(token), api.getFriendRequests(token)]);
@@ -411,7 +426,7 @@ export default function App() {
   }, [page, user, token, leaderboardPeriod, loadFriends, loadLeaderboard, loadLiveRooms, loadRecentMatches, loadTournaments]);
 
   // ── Game actions ──────────────────────────────────
-  function createRoom(maxPlayers, timeControlSec = 60) {
+  function createRoom(maxPlayers, timeControlSec = 120) {
     socket.emit("room:create", { maxPlayers, timeControlSec });
     setPage("game");
     setChatMessages([]);
@@ -431,7 +446,7 @@ export default function App() {
     });
   }
 
-  function queueJoin(maxPlayers, timeControlSec = 60) {
+  function queueJoin(maxPlayers, timeControlSec = 120) {
     socket.emit("queue:join", { maxPlayers, timeControlSec });
   }
 
@@ -504,7 +519,7 @@ export default function App() {
     }
 
     setPendingChallengeTarget(target);
-    createRoom(2, 60);
+    createRoom(2, 120);
   }
 
   function startRoom() {
@@ -883,6 +898,7 @@ export default function App() {
     </>
   );
 }
+
 
 
 

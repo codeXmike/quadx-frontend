@@ -18,7 +18,7 @@ function HomePage({
   const [activeMode, setActiveMode] = useState("play");
   const [maxPlayers, setMaxPlayers] = useState(2);
   const [roomCode, setRoomCode] = useState("");
-  const [timeControl, setTimeControl] = useState(60);
+  const [timeControl, setTimeControl] = useState(120);
 
   const isQueuing = queueStatus != null;
 
