@@ -449,6 +449,7 @@ select option { background: var(--bg2); }
 
 .auth-card {
   width: 100%;
+  min-width: 0;
   max-width: 420px;
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -474,7 +475,8 @@ select option { background: var(--bg2); }
 }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-.google-wrap { display: flex; justify-content: center; }
+.google-wrap { display: flex; justify-content: center; width: 100%; min-width: 0; overflow: hidden; }
+.google-wrap > div { width: 100%; min-width: 0; display: flex; justify-content: center; }
 
 /* ─── HOME ─────────────────────────────────────── */
 .home-grid {
@@ -1026,6 +1028,22 @@ select option { background: var(--bg2); }
   .clock-time { font-size: 1.15rem; }
   .board-outer { --cell-size: clamp(24px, 7.6vw, 42px); padding: 0.6rem; }
   .drop-cols, .board-grid { gap: 0.28rem; }
+}
+
+@media (max-width: 420px) {
+  .auth-page { padding: 0.5rem; }
+  .auth-card { padding: 1rem; border-radius: 12px; }
+}
+
+@media (max-width: 220px) {
+  .auth-page { padding: 0.2rem; }
+  .auth-card { padding: 0.5rem; border-radius: 8px; }
+  .auth-logo { font-size: 1.05rem; }
+  .auth-sub { font-size: 0.72rem; margin-bottom: 0.8rem; }
+  .tab { padding: 0.35rem 0.3rem; font-size: 0.7rem; }
+  .label { font-size: 0.66rem; }
+  input, select, textarea { padding: 0.45rem 0.5rem; font-size: 0.72rem; }
+  .btn { padding: 0.4rem 0.5rem; font-size: 0.72rem; white-space: normal; }
 }
 
 /* ─── MISC ─────────────────────────────────────── */

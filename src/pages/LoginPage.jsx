@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
@@ -25,6 +25,8 @@ function LoginPage({
   const [googleReady, setGoogleReady] = useState(false);
   const [googleError, setGoogleError] = useState("");
   const [googleClientId, setGoogleClientId] = useState("");
+  const [googleWidth, setGoogleWidth] = useState(320);
+  const googleWrapRef = useRef(null);
 
   useEffect(() => {
     if (otpEmail) setEmail(otpEmail);
@@ -69,6 +71,23 @@ function LoginPage({
     setupGoogle();
     return () => { active = false; };
   }, [onGoogleLogin, showOtpPage]);
+
+  useEffect(() => {
+    const measure = () => {
+      const containerWidth = Math.floor(googleWrapRef.current?.clientWidth || (window.innerWidth - 24));
+      const nextWidth = Math.max(120, Math.min(400, containerWidth - 2));
+      setGoogleWidth(nextWidth);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (googleWrapRef.current) ro.observe(googleWrapRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
 
   if (showOtpPage) {
     return (
@@ -184,7 +203,7 @@ function LoginPage({
 
         <div className="auth-divider">or continue with</div>
 
-        <div className="google-wrap">
+        <div className="google-wrap" ref={googleWrapRef}>
           {googleReady && googleClientId ? (
             <GoogleOAuthProvider clientId={googleClientId}>
               <GoogleLogin
@@ -197,10 +216,12 @@ function LoginPage({
                   await onGoogleLogin({ idToken: credentialResponse.credential });
                 }}
                 onError={() => setGoogleError("Google sign-in failed. Please try again.")}
+                type="standard"
                 text="continue_with"
+                logo_alignment="left"
                 shape="rectangular"
-                size="large"
-                width="360"
+                size={googleWidth < 230 ? "medium" : "large"}
+                width={String(googleWidth)}
               />
             </GoogleOAuthProvider>
           ) : null}
