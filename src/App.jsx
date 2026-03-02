@@ -30,6 +30,7 @@ const NAV = [
 const SESSION_TOKEN_KEY = "quadx_token";
 const SESSION_USER_KEY = "quadx_user";
 const FRIEND_MATCH_TIME_CONTROL_SEC = 120;
+const APEX_MIN_RATING = 1900;
 
 export default function App() {
   // Auth
@@ -597,6 +598,11 @@ export default function App() {
 
   // ── Tournaments ───────────────────────────────────
   async function createTournament(payload) {
+    if (Number(user?.rating || 0) < APEX_MIN_RATING) {
+      toast.error("Only Apex and above can create tournaments (1900+ rating required).");
+      return;
+    }
+
     try {
       const { id } = await api.createTournament(token, payload);
       toast.success("Tournament created!");
@@ -890,6 +896,8 @@ export default function App() {
             <TournamentsPage
               tournaments={tournaments}
               currentTournament={currentTournament}
+              canCreateTournament={Number(user?.rating || 0) >= APEX_MIN_RATING}
+              userRating={Number(user?.rating || 0)}
               onCreate={createTournament}
               onJoin={joinTournament}
               onOpen={openTournament}

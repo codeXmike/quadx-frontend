@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function TournamentsPage({ tournaments, currentTournament, onCreate, onJoin, onOpen, onStart, onReport, userId }) {
+function TournamentsPage({ tournaments, currentTournament, canCreateTournament, userRating, onCreate, onJoin, onOpen, onStart, onReport, userId }) {
   const [name, setName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState(16);
   const nameById = Object.fromEntries((currentTournament?.standings || []).map((s) => [s.userId, s.username]));
@@ -22,20 +22,26 @@ function TournamentsPage({ tournaments, currentTournament, onCreate, onJoin, onO
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div className="card">
             <div className="panel-title mb">Create Tournament</div>
+            {!canCreateTournament && (
+              <div className="text-xs text-dim mb-sm">
+                Tournament creation requires Apex+ (1900 rating). Current rating: {Number(userRating || 0)}.
+              </div>
+            )}
             <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Tournament name..."
                 style={{ flex: 1, minWidth: "160px" }}
+                disabled={!canCreateTournament}
               />
-              <select value={maxPlayers} onChange={(e) => setMaxPlayers(Number(e.target.value))} style={{ width: "auto" }}>
+              <select value={maxPlayers} onChange={(e) => setMaxPlayers(Number(e.target.value))} style={{ width: "auto" }} disabled={!canCreateTournament}>
                 {[8, 16, 32, 64].map((n) => <option key={n} value={n}>{n}p</option>)}
               </select>
               <button
                 className="btn btn-primary"
                 onClick={() => { onCreate({ name, maxPlayers }); setName(""); }}
-                disabled={!name.trim()}
+                disabled={!name.trim() || !canCreateTournament}
               >
                 Create
               </button>

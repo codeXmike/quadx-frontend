@@ -80,10 +80,10 @@ function FriendsPage({
             <div key={u.id} className="friend-row">
               <div className="friend-main">
                 <div className="friend-avatar">
-                  {u.avatarUrl ? <img src={u.avatarUrl} alt={u.username} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : u.username[0].toUpperCase()}
+                  {u.avatarUrl ? <img src={u.avatarUrl} alt={u.username} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : (u.username?.[0]?.toUpperCase() || "?")}
                 </div>
                 <div>
-                  <div className="friend-name">{u.username}</div>
+                  <div className="friend-name">{u.username || "Unknown"}</div>
                   <div className="text-xs text-dim">Rank: {u.rating}</div>
                 </div>
               </div>
@@ -118,9 +118,9 @@ function FriendsPage({
           {incomingRequests.map((r) => (
             <div key={r.id} className="friend-row">
               <div className="friend-main">
-                <div className="friend-avatar">{r.from.username[0].toUpperCase()}</div>
+                <div className="friend-avatar">{r.from?.username?.[0]?.toUpperCase() || "?"}</div>
                 <div>
-                  <div className="friend-name">{r.from.username}</div>
+                  <div className="friend-name">{r.from?.username || "Unknown"}</div>
                   <div className="text-xs text-dim">Wants to connect</div>
                 </div>
               </div>
@@ -147,9 +147,9 @@ function FriendsPage({
           return (
             <div key={f.id} className="friend-row">
               <div className="friend-main">
-                <div className="friend-avatar">{f.username[0].toUpperCase()}</div>
+                <div className="friend-avatar">{f.username?.[0]?.toUpperCase() || "?"}</div>
                 <div>
-                  <div className="friend-name">{f.username}</div>
+                  <div className="friend-name">{f.username || "Unknown"}</div>
                   <div className="text-xs text-dim">{statusText}</div>
                 </div>
               </div>
@@ -179,7 +179,7 @@ function FriendsPage({
           <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
             {outgoingRequests.map((r) => (
               <div key={r.id} className="text-sm text-muted">
-                {r.to.username}
+                {r.to?.username || "Unknown"}
               </div>
             ))}
           </div>

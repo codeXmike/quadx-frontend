@@ -928,6 +928,8 @@ select option { background: var(--bg2); }
   position: relative;
   margin-top: 0.5rem;
   padding: 3.25rem 0.3rem 3rem;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 .ranks-track {
@@ -1061,6 +1063,7 @@ select option { background: var(--bg2); }
   flex-direction: column;
   align-items: flex-end;
   gap: 0.12rem;
+  flex-shrink: 0;
 }
 
 /* ─── LEADERBOARD ─────────────────────────────── */
@@ -1239,9 +1242,21 @@ select option { background: var(--bg2); }
   .ranks-track-wrap { padding-top: 2.8rem; padding-bottom: 2.6rem; }
   .ranks-stop-label { display: none; }
   .ranks-marker-label { max-width: 56px; }
+  .ranks-marker:not(.you) .ranks-marker-label { display: none; }
 }
 
 @media (max-width: 420px) {
+  .ranks-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+  .ranks-row-stats {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
   .auth-page { padding: 0.5rem; }
   .auth-card { padding: 1rem; border-radius: 12px; }
 }
