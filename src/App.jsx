@@ -742,30 +742,15 @@ export default function App() {
     try {
       if (!token) throw new Error("Not authenticated");
       if (!file || file.size > 6 * 1024 * 1024) throw new Error("Image must be 6MB or less");
-      const auth = await api.getAvatarUploadAuth(token);
-      const rawExt = String(file.name || "").split(".").pop() || "png";
-      const ext = String(rawExt).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5) || "png";
-      const usernameSlug = String(userRef.current?.username || "player").replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase() || "player";
-      const fileName = `${usernameSlug}-${Date.now()}.${ext}`;
-
-      const form = new FormData();
-      form.append("file", file);
-      form.append("fileName", fileName);
-      form.append("publicKey", auth.publicKey);
-      form.append("signature", auth.signature);
-      form.append("expire", String(Number(auth.expire)));
-      form.append("token", auth.token);
-      if (auth.uploadFolder) form.append("folder", auth.uploadFolder);
-
-      const response = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
-        method: "POST",
-        body: form
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data?.url) {
-        throw new Error(data?.message || "Image upload failed");
+      if (!String(file.type || "").toLowerCase().startsWith("image/")) throw new Error("Only image files are allowed");
+      const data = await api.uploadAvatarFile(token, file);
+      if (data?.user) {
+        setUser(data.user);
+        userRef.current = data.user;
+        if (data.token) setToken(data.token || "cookie");
+        persistSession(data.token || token || "cookie", data.user);
       }
-      toast.success("Image uploaded. Save changes to apply.");
+      toast.success("Image uploaded.");
       return { url: data.url };
     } catch (error) {
       toast.error(error.message || "Image upload failed");

@@ -36,6 +36,27 @@ export const api = {
   getMe: (token) => request("/api/auth/me", { token }),
   getSettings: (token) => request("/api/user/settings", { token }),
   getAvatarUploadAuth: (token) => request("/api/user/avatar-upload/auth", { token }),
+  uploadAvatarFile: async (token, file) => {
+    const useBearer = Boolean(token && token !== "cookie");
+    const form = new FormData();
+    form.append("file", file);
+    const response = await fetch(`${API_URL}/api/user/avatar-upload`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        ...(useBearer ? { Authorization: `Bearer ${token}` } : {})
+      },
+      body: form
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const err = new Error(data.message || "Upload failed");
+      err.data = data;
+      err.status = response.status;
+      throw err;
+    }
+    return data;
+  },
   updateSettings: (token, payload) =>
     request("/api/user/settings", { method: "PATCH", token, body: payload }),
   deleteAccount: (token, payload) =>
