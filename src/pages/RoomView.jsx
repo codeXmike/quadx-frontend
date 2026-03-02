@@ -50,6 +50,7 @@ function RoomView({
   const currentTurnMark = room.turn?.mark || null;
   const boardRows = room.board?.length || 0;
   const boardCols = room.board?.[0]?.length || 0;
+  const reconnectingPlayer = room.players.find((p) => !p.connected && !p.eliminated && Number(p.reconnectGraceRemainingMs || 0) > 0);
 
   return (
     <div className="room-layout">
@@ -89,7 +90,11 @@ function RoomView({
               <span className="text-xs text-dim">{Number(p.rating || 1000)}</span>
               <span className="chip-mark">({p.mark})</span>
               {String(p.userId || "") === String(currentUserId || "") && <span className="chip-you">YOU</span>}
-              {!p.connected && <span className="text-xs" style={{ color: "var(--danger)" }}><Icon name="x" size={11} /></span>}
+              {!p.connected && !p.eliminated && (
+                <span className="text-xs text-amber">
+                  reconnect {Math.ceil(Number(p.reconnectGraceRemainingMs || 0) / 1000)}s
+                </span>
+              )}
               {p.eliminated && <span className="text-xs text-dim">{p.eliminatedByTimeout ? "timeout" : "out"}</span>}
               {isHost && (room.players[0]?.playerId === p.playerId) && <span className="text-xs text-amber"><Icon name="crown" size={11} /></span>}
             </div>
@@ -114,7 +119,11 @@ function RoomView({
           )
         ) : room.status === "in_progress" ? (
           <div className="game-status playing">
-            {myTurn ? (<><Icon name="zap" size={14} /> Your turn - drop a piece!</>) : `Waiting for ${room.turn?.username || "opponent"}...`}
+            {reconnectingPlayer
+              ? `${reconnectingPlayer.username} reconnecting...`
+              : myTurn
+                ? (<><Icon name="zap" size={14} /> Your turn - drop a piece!</>)
+                : `Waiting for ${room.turn?.username || "opponent"}...`}
           </div>
         ) : null}
 

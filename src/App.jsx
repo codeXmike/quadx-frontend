@@ -330,6 +330,9 @@ export default function App() {
     socket.on("room:spectating", ({ roomId }) => {
       toast.info(`Spectating room ${roomId}`);
     });
+    socket.on("room:reconnected", ({ roomId }) => {
+      toast.success(`Reconnected to room ${roomId}`);
+    });
     socket.on("rooms:live", ({ rooms }) => {
       setLiveRooms(Array.isArray(rooms) ? rooms : []);
     });
@@ -364,6 +367,7 @@ export default function App() {
       socket.off("ping:pong");
       socket.off("room:invite");
       socket.off("room:spectating");
+      socket.off("room:reconnected");
       socket.off("rooms:live");
       socket.off("turn:timeout");
       socket.off("error:event");
