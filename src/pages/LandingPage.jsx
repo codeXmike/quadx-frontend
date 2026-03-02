@@ -3,7 +3,7 @@ import Icon from "../components/Icon";
 function LandingPage({ onOpenLogin }) {
   const features = [
     { icon: "zap", title: "Multiplayer", desc: "Online matches with 2, 3, or 4 players simultaneously." },
-    { icon: "trophy", title: "Ranked Ladder", desc: "Elo based rating system with daily, weekly, and all-time leaderboards." },
+    { icon: "trophy", title: "Rank Ladder", desc: "Elo based rating system with daily, weekly, and all-time leaderboards." },
     { icon: "target", title: "Swiss Tournaments", desc: "Competitive events with smart Swiss-system pairings and live standings." },
     { icon: "friends", title: "Friends & Challenges", desc: "Add friends, send invites, and challenge anyone directly." },
     { icon: "clock", title: "Clock Timing", desc: "Per-player time banks that carry across turns for true competitive format." },
