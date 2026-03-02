@@ -473,7 +473,7 @@ export default function App() {
 
   function dropMove(column) {
     if (!room) return;
-    socket.emit("move:drop", { roomId: room.id, column });
+    socket.emit("move:drop", { roomId: room.id, column, turnSerial: room.turnSerial });
   }
 
   function leaveRoom() {
