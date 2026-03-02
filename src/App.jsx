@@ -31,6 +31,7 @@ const SESSION_TOKEN_KEY = "quadx_token";
 const SESSION_USER_KEY = "quadx_user";
 const FRIEND_MATCH_TIME_CONTROL_SEC = 120;
 const APEX_MIN_RATING = 1900;
+const DEFAULT_SETTINGS = { hideDropButtons: false, confirmMoves: false };
 
 export default function App() {
   // Auth
@@ -72,7 +73,7 @@ export default function App() {
   const [profileData, setProfileData] = useState(null);
   const [tournaments, setTournaments] = useState([]);
   const [currentTournament, setCurrentTournament] = useState(null);
-  const [settings, setSettings] = useState({ hideDropButtons: false });
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [settingsLoading, setSettingsLoading] = useState(false);
 
   function insertChatDivider(label = "New match started") {
@@ -160,7 +161,7 @@ export default function App() {
     setToken(nextToken);
     setUser(u);
     userRef.current = u;
-    setSettings(u.settings || { hideDropButtons: false });
+    setSettings(u.settings || DEFAULT_SETTINGS);
     persistSession(nextToken, u);
     setPage("home");
   }
@@ -233,7 +234,7 @@ export default function App() {
       if (storedUser) {
         setUser(storedUser);
         userRef.current = storedUser;
-        setSettings(storedUser.settings || { hideDropButtons: false });
+        setSettings(storedUser.settings || DEFAULT_SETTINGS);
         setToken(storedToken || "cookie");
         setPage("home");
       }
@@ -245,7 +246,7 @@ export default function App() {
         setToken(nextToken);
         setUser(freshUser);
         userRef.current = freshUser;
-        setSettings(freshUser.settings || { hideDropButtons: false });
+        setSettings(freshUser.settings || DEFAULT_SETTINGS);
         persistSession(nextToken, freshUser);
         setPage("home");
       } catch (err) {
@@ -255,7 +256,7 @@ export default function App() {
           setToken(storedToken || "cookie");
           setUser(storedUser);
           userRef.current = storedUser;
-          setSettings(storedUser.settings || { hideDropButtons: false });
+          setSettings(storedUser.settings || DEFAULT_SETTINGS);
           console.warn("Using cached local session. Server auth check failed.");
         } else {
           setToken(null);
@@ -473,6 +474,10 @@ export default function App() {
 
   function dropMove(column) {
     if (!room) return;
+    if (settings.confirmMoves) {
+      const ok = window.confirm(`Confirm move in column ${Number(column) + 1}?`);
+      if (!ok) return;
+    }
     socket.emit("move:drop", { roomId: room.id, column, turnSerial: room.turnSerial });
   }
 
@@ -688,11 +693,28 @@ export default function App() {
     }
   }
 
+  async function deleteAccount() {
+    if (!token) return;
+    const confirmed = window.confirm("Delete account permanently? This cannot be undone.");
+    if (!confirmed) return;
+
+    const password = window.prompt("Enter password to confirm deletion (leave empty for Google accounts):") || "";
+    try {
+      await api.deleteAccount(token, { password });
+      toast.success("Account deleted");
+      await logout();
+    } catch (err) {
+      toast.error(err.message || "Failed to delete account");
+    }
+  }
+
   async function uploadAvatar(file) {
     try {
       if (!token) throw new Error("Not authenticated");
+      if (!file || file.size > 6 * 1024 * 1024) throw new Error("Image must be 6MB or less");
       const auth = await api.getAvatarUploadAuth(token);
-      const ext = String(file.name || "").split(".").pop() || "png";
+      const rawExt = String(file.name || "").split(".").pop() || "png";
+      const ext = String(rawExt).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5) || "png";
       const usernameSlug = String(userRef.current?.username || "player").replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase() || "player";
       const fileName = `${usernameSlug}-${Date.now()}.${ext}`;
 
@@ -701,10 +723,9 @@ export default function App() {
       form.append("fileName", fileName);
       form.append("publicKey", auth.publicKey);
       form.append("signature", auth.signature);
-      form.append("expire", String(auth.expire));
+      form.append("expire", String(Number(auth.expire)));
       form.append("token", auth.token);
-      form.append("folder", auth.uploadFolder || "/quadx/avatars");
-      form.append("useUniqueFileName", "true");
+      if (auth.uploadFolder) form.append("folder", auth.uploadFolder);
 
       const response = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
         method: "POST",
@@ -733,7 +754,7 @@ export default function App() {
       <>
         <div className="app">
           <main className="content" style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
-            <div className="text-muted">Loading session...</div>
+            <div className="text-muted">Checking your account...</div>
           </main>
         </div>
         <ToastContainer toasts={toasts} />
@@ -853,6 +874,7 @@ export default function App() {
               onJoinFriendRoom={joinRoom}
               onSpectateRoom={spectateRoom}
               onOpenGame={() => setPage("game")}
+              onOpenProfile={openProfile}
             />
           )}
 
@@ -869,6 +891,7 @@ export default function App() {
               onSendChat={sendChat}
               onInvite={inviteFriends}
               onRematch={rematch}
+              friends={friends}
             />
           )}
 
@@ -926,6 +949,8 @@ export default function App() {
               onSave={saveSettings}
               onUploadAvatar={uploadAvatar}
               onBack={() => setPage("home")}
+              onLogout={logout}
+              onDeleteAccount={deleteAccount}
               loading={settingsLoading}
             />
           )}

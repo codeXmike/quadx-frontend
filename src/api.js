@@ -38,6 +38,8 @@ export const api = {
   getAvatarUploadAuth: (token) => request("/api/user/avatar-upload/auth", { token }),
   updateSettings: (token, payload) =>
     request("/api/user/settings", { method: "PATCH", token, body: payload }),
+  deleteAccount: (token, payload) =>
+    request("/api/user/account", { method: "DELETE", token, body: payload }),
   getFriends: (token) => request("/api/friends", { token }),
   getFriendRequests: (token) => request("/api/friends/requests", { token }),
   searchFriendUsers: (token, query) =>

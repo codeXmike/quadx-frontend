@@ -15,6 +15,7 @@ function RoomView({
   onSendChat,
   onInvite,
   onRematch,
+  friends,
 }) {
   const isHost = String(room.players[0]?.userId || "") === String(currentUserId || "");
   const myPlayer = room.players.find((p) => String(p.userId || "") === String(currentUserId || ""));
@@ -23,7 +24,7 @@ function RoomView({
   const canPlay = Boolean(myPlayer && myTurn && room.status === "in_progress" && !room.winner);
   const playersByMark = Object.fromEntries(room.players.map((p) => [p.mark, { ...p }]));
   const [chatInput, setChatInput] = useState("");
-  const [inviteInput, setInviteInput] = useState("");
+  const [inviteTarget, setInviteTarget] = useState("");
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -40,10 +41,10 @@ function RoomView({
 
   function submitInvite(e) {
     e.preventDefault();
-    const targets = inviteInput.split(",").map((v) => v.trim()).filter(Boolean);
+    const targets = [inviteTarget].map((v) => String(v || "").trim()).filter(Boolean);
     if (!targets.length) return;
     onInvite(targets);
-    setInviteInput("");
+    setInviteTarget("");
   }
 
   const gameOver = room.status === "completed";
@@ -51,6 +52,10 @@ function RoomView({
   const boardRows = room.board?.length || 0;
   const boardCols = room.board?.[0]?.length || 0;
   const reconnectingPlayer = room.players.find((p) => !p.connected && !p.eliminated && Number(p.reconnectGraceRemainingMs || 0) > 0);
+  const myRematchVote = (room.rematchVotes || []).includes(String(currentUserId || ""));
+  const rematchVotes = Number(room.rematchVotes?.length || 0);
+  const connectedPlayers = room.players.filter((p) => p.connected).length;
+  const invitableFriends = (friends || []).filter((f) => !room.players.some((p) => String(p.username || "").toLowerCase() === String(f.username || "").toLowerCase()));
 
   return (
     <div className="room-layout">
@@ -133,7 +138,7 @@ function RoomView({
           onDrop={onDrop}
           playersByMark={playersByMark}
           hideDropButtons={hideDropButtons}
-          winningCells={[]}
+          winningCells={room.winningCells || []}
         />
 
         {room.status === "waiting" && isHost && (
@@ -146,20 +151,23 @@ function RoomView({
               Start Match ({room.players.length}/{room.maxPlayers})
             </button>
             <form onSubmit={submitInvite} style={{ display: "flex", gap: "0.5rem", flex: 1, minWidth: "200px" }}>
-              <input
-                value={inviteInput}
-                onChange={(e) => setInviteInput(e.target.value)}
-                placeholder="Invite by username or email..."
-                style={{ fontSize: "0.82rem" }}
-              />
+              <select value={inviteTarget} onChange={(e) => setInviteTarget(e.target.value)} style={{ fontSize: "0.82rem" }}>
+                <option value="">Select friend to invite</option>
+                {invitableFriends.map((f) => (
+                  <option key={f.id} value={f.username}>{f.username}</option>
+                ))}
+              </select>
               <button type="submit" className="btn btn-secondary">Invite</button>
             </form>
           </div>
         )}
 
-        {gameOver && isHost && (
+        {gameOver && !isSpectator && (
           <div style={{ marginTop: "0.75rem" }}>
-            <button className="btn btn-secondary" onClick={onRematch}><Icon name="refresh" size={13} /> Rematch</button>
+            <button className="btn btn-secondary" onClick={onRematch}>
+              <Icon name="refresh" size={13} /> {myRematchVote ? "Waiting for Others..." : "Accept Rematch"}
+            </button>
+            <div className="text-xs text-dim mt-sm">Rematch votes: {rematchVotes}/{connectedPlayers}</div>
           </div>
         )}
       </div>

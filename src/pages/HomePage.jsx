@@ -129,11 +129,9 @@ function HomePage({
                 { players: 3, label: "3-Player Arena", desc: "Three-way competitive chaos" },
                 { players: 4, label: "4-Player Arena", desc: "Full board free-for-all" },
               ].map(({ players, label, desc }) => (
-                <button
+                <div
                   key={players}
                   className={`mode-btn${isQueuing && queueStatus?.modeSize === players ? " queuing" : ""}`}
-                  onClick={() => onQueueJoin(players, timeControl)}
-                  disabled={!connected}
                 >
                   <div className="mode-info">
                     <div className="mode-title">{label}</div>
@@ -150,7 +148,14 @@ function HomePage({
                       </div>
                     )}
                   </div>
-                </button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => onQueueJoin(players, timeControl)}
+                    disabled={!connected}
+                  >
+                    Play
+                  </button>
+                </div>
               ))}
 
               {isQueuing && (

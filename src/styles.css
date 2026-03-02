@@ -553,12 +553,13 @@ select option { background: var(--bg2); }
 .mode-btn {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.1rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  cursor: pointer;
+  cursor: default;
   transition: all 0.2s;
   text-align: left;
   width: 100%;
@@ -860,6 +861,13 @@ select option { background: var(--bg2); }
   box-shadow: inset 0 -3px 6px rgba(0,0,0,0.35), inset 0 2px 4px rgba(255,255,255,0.12);
 }
 
+.cell.winning {
+  border-color: color-mix(in srgb, var(--cell-color) 70%, white);
+}
+.cell.winning::after {
+  filter: brightness(1.38) saturate(1.2);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--cell-color) 75%, white);
+}
 .cell.winning { animation: winGlow 0.8s ease infinite alternate; }
 @keyframes winGlow {
   from { box-shadow: 0 0 8px var(--cell-color); }
@@ -1246,6 +1254,7 @@ select option { background: var(--bg2); }
   .ranks-stop-label { display: none; }
   .ranks-marker-label { max-width: 56px; }
   .ranks-marker:not(.you) .ranks-marker-label { display: none; }
+  .toggle-row { flex-direction: column; align-items: flex-start; }
 }
 
 @media (max-width: 420px) {

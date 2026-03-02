@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import Icon from "../components/Icon";
 
-function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar }) {
+function SettingsPage({ user, settings, onSave, onBack, onLogout, onDeleteAccount, loading, onUploadAvatar }) {
   const [username, setUsername] = useState(user?.username || "");
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || "");
   const [hideDropButtons, setHideDropButtons] = useState(Boolean(settings?.hideDropButtons));
+  const [confirmMoves, setConfirmMoves] = useState(Boolean(settings?.confirmMoves));
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -14,7 +15,8 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
 
   useEffect(() => {
     setHideDropButtons(Boolean(settings?.hideDropButtons));
-  }, [settings?.hideDropButtons]);
+    setConfirmMoves(Boolean(settings?.confirmMoves));
+  }, [settings?.hideDropButtons, settings?.confirmMoves]);
 
   const initials = (username || "?")[0].toUpperCase();
 
@@ -23,7 +25,7 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
     event.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) return;
-    if (file.size > 8 * 1024 * 1024) return;
+    if (file.size > 6 * 1024 * 1024) return;
     if (typeof onUploadAvatar !== "function") return;
     setUploading(true);
     try {
@@ -43,7 +45,7 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
         <button className="btn btn-ghost" onClick={onBack}><Icon name="arrow-left" size={14} /> Back</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+      <div className="settings-grid">
         {/* Profile */}
         <div className="card">
           <div className="panel-title mb">Profile</div>
@@ -77,7 +79,7 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
               placeholder="https://example.com/avatar.jpg"
             />
             <div className="text-xs text-muted" style={{ marginTop: "0.35rem" }}>
-              Or upload an image (max 8MB).
+              Or upload an image (max 6MB).
             </div>
             <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
               <label className="btn btn-secondary btn-sm" style={{ cursor: uploading ? "wait" : "pointer" }}>
@@ -95,7 +97,7 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
 
           <button
             className="btn btn-primary btn-full"
-            onClick={() => onSave({ username, avatarUrl, hideDropButtons })}
+            onClick={() => onSave({ username, avatarUrl, hideDropButtons, confirmMoves })}
             disabled={loading}
           >
             {loading ? "Saving..." : "Save Changes"}
@@ -116,6 +118,21 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
                 type="checkbox"
                 checked={hideDropButtons}
                 onChange={(e) => setHideDropButtons(e.target.checked)}
+              />
+              <span className="switch-track" />
+            </label>
+          </div>
+
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">Confirm Moves</div>
+              <div className="toggle-desc">Prompt before each move is sent</div>
+            </div>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={confirmMoves}
+                onChange={(e) => setConfirmMoves(e.target.checked)}
               />
               <span className="switch-track" />
             </label>
@@ -143,6 +160,12 @@ function SettingsPage({ user, settings, onSave, onBack, loading, onUploadAvatar 
                 {user?.draws ?? 0}D
               </span>
             </div>
+          </div>
+
+          <div className="sep" />
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <button className="btn btn-secondary btn-sm" onClick={onLogout}>Log Out</button>
+            <button className="btn btn-danger btn-sm" onClick={onDeleteAccount}>Delete Account</button>
           </div>
         </div>
       </div>

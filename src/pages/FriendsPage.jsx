@@ -15,6 +15,7 @@ function FriendsPage({
   onJoinFriendRoom,
   onSpectateRoom,
   onOpenGame,
+  onOpenProfile,
 }) {
   const [friendQuery, setFriendQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -146,7 +147,7 @@ function FriendsPage({
 
           return (
             <div key={f.id} className="friend-row">
-              <div className="friend-main">
+              <div className="friend-main" style={{ cursor: "pointer" }} onClick={() => onOpenProfile?.(f.username)}>
                 <div className="friend-avatar">{f.username?.[0]?.toUpperCase() || "?"}</div>
                 <div>
                   <div className="friend-name">{f.username || "Unknown"}</div>
