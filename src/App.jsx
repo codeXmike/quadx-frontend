@@ -193,6 +193,13 @@ export default function App() {
     }
   }
 
+  function openVerifyEmail(email = "") {
+    setAuthError("");
+    setMfaRequired(false);
+    setOtpEmail(String(email || "").trim());
+    setShowOtpPage(true);
+  }
+
   async function logout() {
     try {
       await api.logout();
@@ -746,6 +753,7 @@ export default function App() {
           onGoogleLogin={handleGoogleLogin}
           onVerifyEmail={handleVerifyEmail}
           onResendVerification={handleResendVerification}
+          onOpenVerifyEmail={openVerifyEmail}
           otpEmail={otpEmail}
           showOtpPage={showOtpPage}
           onBackToLogin={() => { setShowOtpPage(false); setAuthError(""); }}

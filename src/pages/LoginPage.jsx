@@ -9,6 +9,7 @@ function LoginPage({
   onGoogleLogin,
   onVerifyEmail,
   onResendVerification,
+  onOpenVerifyEmail,
   otpEmail,
   showOtpPage,
   onBackToLogin,
@@ -198,6 +199,13 @@ function LoginPage({
           )}
           <button className="btn btn-primary btn-full" disabled={loading} type="submit">
             {loading ? "Loading..." : mode === "login" ? "Sign In" : "Create Account"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-full"
+            onClick={() => onOpenVerifyEmail(email)}
+          >
+            Verify Email / Enter OTP
           </button>
         </form>
 
