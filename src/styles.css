@@ -68,8 +68,12 @@ img, svg, video, canvas {
   display: flex;
   flex-direction: column;
   padding: 1.25rem 0.75rem;
-  position: relative;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   gap: 0.25rem;
   backdrop-filter: blur(12px);
   z-index: 50;
@@ -166,7 +170,7 @@ img, svg, video, canvas {
 .user-name { font-size: 0.8rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-rating { font-size: 0.7rem; font-family: 'DM Mono', monospace; color: var(--amber); }
 
-.content { flex: 1; min-width: 0; padding: 1.5rem; max-width: calc(100vw - 220px); }
+.content { flex: 1; min-width: 0; padding: 1.5rem; margin-left: 220px; max-width: calc(100vw - 220px); }
 
 /* ─── COMMON ─────────────────────────────────────── */
 .page-header {
@@ -1230,7 +1234,7 @@ select option { background: var(--bg2); }
   .sidebar-brand-name, .nav-item span:not(.nav-icon), .user-info { display: none; }
   .nav-item { justify-content: center; padding: 0.6rem; }
   .sidebar-user { justify-content: center; }
-  .content { max-width: calc(100vw - 60px); padding: 1rem 0.75rem; }
+  .content { margin-left: 60px; max-width: calc(100vw - 60px); padding: 1rem 0.75rem; }
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .chess-clocks { gap: 0.4rem; }
   .chess-clock { min-width: 75px; padding: 0.5rem 0.7rem; }
