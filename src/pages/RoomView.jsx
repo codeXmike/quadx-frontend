@@ -146,11 +146,11 @@ function RoomView({
         />
 
         {hasPendingMove && canPlay && (
-          <div style={{ marginTop: "0.65rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <button className="btn btn-primary btn-sm" onClick={onConfirmMove} title="Confirm move">
+          <div style={{ marginTop: "0.65rem", display: "flex", gap: "0.7rem", alignItems: "center" }}>
+            <button className="btn btn-primary btn-sm p-4" onClick={onConfirmMove} title="Confirm move">
               ✓
             </button>
-            <button className="btn btn-ghost btn-sm" onClick={onCancelMove} title="Cancel move">
+            <button className="btn btn-ghost btn-sm p-4" onClick={onCancelMove} title="Cancel move">
               <Icon name="x" size={13} />
             </button>
             <span className="text-xs text-dim">Confirm column {Number(pendingMove?.column) + 1}</span>
