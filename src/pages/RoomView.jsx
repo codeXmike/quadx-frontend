@@ -16,6 +16,9 @@ function RoomView({
   onInvite,
   onRematch,
   friends,
+  pendingMove,
+  onConfirmMove,
+  onCancelMove,
 }) {
   const isHost = String(room.players[0]?.userId || "") === String(currentUserId || "");
   const myPlayer = room.players.find((p) => String(p.userId || "") === String(currentUserId || ""));
@@ -52,6 +55,7 @@ function RoomView({
   const boardRows = room.board?.length || 0;
   const boardCols = room.board?.[0]?.length || 0;
   const reconnectingPlayer = room.players.find((p) => !p.connected && !p.eliminated && Number(p.reconnectGraceRemainingMs || 0) > 0);
+  const hasPendingMove = Boolean(pendingMove && pendingMove.roomId === room.id);
   const myRematchVote = (room.rematchVotes || []).includes(String(currentUserId || ""));
   const rematchVotes = Number(room.rematchVotes?.length || 0);
   const connectedPlayers = room.players.filter((p) => p.connected).length;
@@ -140,6 +144,18 @@ function RoomView({
           hideDropButtons={hideDropButtons}
           winningCells={room.winningCells || []}
         />
+
+        {hasPendingMove && canPlay && (
+          <div style={{ marginTop: "0.65rem", display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <button className="btn btn-primary btn-sm" onClick={onConfirmMove} title="Confirm move">
+              ✓
+            </button>
+            <button className="btn btn-ghost btn-sm" onClick={onCancelMove} title="Cancel move">
+              <Icon name="x" size={13} />
+            </button>
+            <span className="text-xs text-dim">Confirm column {Number(pendingMove?.column) + 1}</span>
+          </div>
+        )}
 
         {room.status === "waiting" && isHost && (
           <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", marginTop: "0.75rem" }}>

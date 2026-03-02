@@ -75,6 +75,7 @@ export default function App() {
   const [currentTournament, setCurrentTournament] = useState(null);
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [settingsLoading, setSettingsLoading] = useState(false);
+  const [pendingMove, setPendingMove] = useState(null);
 
   function insertChatDivider(label = "New match started") {
     setChatMessages((prev) => {
@@ -475,10 +476,33 @@ export default function App() {
   function dropMove(column) {
     if (!room) return;
     if (settings.confirmMoves) {
-      const ok = window.confirm(`Confirm move in column ${Number(column) + 1}?`);
-      if (!ok) return;
+      setPendingMove({
+        roomId: room.id,
+        column: Number(column),
+        turnSerial: Number(room.turnSerial || 0)
+      });
+      return;
     }
     socket.emit("move:drop", { roomId: room.id, column, turnSerial: room.turnSerial });
+  }
+
+  function confirmPendingMove() {
+    if (!room || !pendingMove) return;
+    if (pendingMove.roomId !== room.id || Number(pendingMove.turnSerial) !== Number(room.turnSerial || 0)) {
+      setPendingMove(null);
+      toast.info("Turn changed. Select a new move.");
+      return;
+    }
+    socket.emit("move:drop", {
+      roomId: room.id,
+      column: pendingMove.column,
+      turnSerial: pendingMove.turnSerial
+    });
+    setPendingMove(null);
+  }
+
+  function cancelPendingMove() {
+    setPendingMove(null);
   }
 
   function leaveRoom() {
@@ -565,6 +589,12 @@ export default function App() {
     inviteFriends([pendingChallengeTarget]);
     setPendingChallengeTarget(null);
   }, [pendingChallengeTarget, room]);
+
+  useEffect(() => {
+    if (!pendingMove || !room) return;
+    const sameTurn = pendingMove.roomId === room.id && Number(pendingMove.turnSerial) === Number(room.turnSerial || 0);
+    if (!sameTurn) setPendingMove(null);
+  }, [pendingMove, room]);
 
   // ── Friend actions ────────────────────────────────
   async function sendFriendRequest(identifier) {
@@ -892,6 +922,9 @@ export default function App() {
               onInvite={inviteFriends}
               onRematch={rematch}
               friends={friends}
+              pendingMove={pendingMove}
+              onConfirmMove={confirmPendingMove}
+              onCancelMove={cancelPendingMove}
             />
           )}
 
